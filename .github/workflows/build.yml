@@ -19,24 +19,24 @@ jobs:
       - run: export RELEASE_VERSION_CTP_ASUSTOR_TS=$(curl --silent "https://api.github.com/repos/charlieporth1/asustor-tailscale/tags" | jq -r '.[0].name'); echo "RELEASE_VERSION_CTP_ASUSTOR_TS=$RELEASE_VERSION_CTP_ASUSTOR_TS" >> $GITHUB_ENV
 
       - id: checkout
-        if: steps.new_version.conclusion == 'success'      
         uses: actions/checkout@v3
         name: Auto Builder
-        
+
       - run: sudo chown $USER:$USER -R .
-      - run: sudo chown $USER:$USER -R .  
+      - run: sudo chown $USER:$USER -R .
       - run: sudo cp -rf apk/CONTROL/config.json.edit apk/CONTROL/config.json
 
       - run: sudo sed -i "s|RELEASE_VERSION|$RELEASE_VERSION|g" apk/CONTROL/config.json
-      - run: sleep 5s
+      - run: sleep 5
 
       - run: echo "ARCH=amd64" >> $GITHUB_ENV
-      - run: sleep 5s
+      - run: sleep 5
       - run: sudo -E ./scripts/build.sh
       - run: sudo -E ./scripts/apkg-tools_py3.py create apk
 
+      - run: sudo cp -rf apk/CONTROL/config.json.edit apk/CONTROL/config.json
       - run: sudo sed -i "s|x86_64|${{ env.AARCH64 }}|g" apk/CONTROL/config.json
-      - run: sleep 5s
+      - run: sleep 5
 
       - run: echo "ARCH=arm64" >> $GITHUB_ENV
       - run: sleep 5s
@@ -46,11 +46,10 @@ jobs:
       - run: sudo cp -rf apk/CONTROL/config.json.edit apk/CONTROL/config.json
 
       - id: commit
-        if: steps.new_version.conclusion == 'success'
         run: sudo ls -R
       - run: sudo git config --local user.name github-actions
       - run: sudo git config --local user.email github-actions@github.com
-      - run: sudo git filter-branch --force --index-filter "git rm --cached --ignore-unmatch tailscale_*_*" --prune-empty --tag-name-filter cat -- --all || exit 0
+      - run: sudo git filter-branch --force --index-filter "git rm --cached --ignore-unmatch tailscale_*" --prune-empty --tag-name-filter cat -- --all || exit 0
       - run: sudo git gc --prune=now || exit 0
       - run: sudo git gc --aggressive --prune=now || exit 0
       - run: sudo git add .
@@ -60,7 +59,6 @@ jobs:
       - run: sudo git push origin HEAD:master
 
       - id: upload
-        if: steps.new_version.conclusion == 'success'      
         uses: actions/upload-artifact@v3
         with:
           name: tailscale_${{ env.RELEASE_VERSION }}_${{ env.AARCH64 }}.apk
@@ -72,7 +70,6 @@ jobs:
           path: tailscale_${{ env.RELEASE_VERSION }}_${{ env.X86_64 }}.apk
 
       - id: release
-        if: steps.new_version.conclusion == 'success'      
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
