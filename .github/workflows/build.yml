@@ -58,12 +58,12 @@ jobs:
       - run: sudo git push origin HEAD:master
 
       - id: upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: tailscale_${{ env.RELEASE_VERSION }}_${{ env.AARCH64 }}.apk
           path: tailscale_${{ env.RELEASE_VERSION }}_${{ env.AARCH64 }}.apk
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: tailscale_${{ env.RELEASE_VERSION }}_${{ env.X86_64 }}.apk
           path: tailscale_${{ env.RELEASE_VERSION }}_${{ env.X86_64 }}.apk
