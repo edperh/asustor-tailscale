@@ -6,9 +6,8 @@ env:
    env_file: .env
 
 on:
-  push:
-  schedule:
-    - cron: '0 6 * * *'
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
